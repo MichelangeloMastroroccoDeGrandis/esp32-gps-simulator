@@ -7,7 +7,7 @@ const char* ssid = "Michelangelo_5G";
 const char* password = "0661153026";
 
 // ✅ 2. Replace this with your computer’s local IP address (running Node-RED)
-const char* serverUrl = "http://192.168.1.38:1880/gpsdata";
+const char* serverUrl = "http://localhost:1880/gpsdata";
 
 void setup() {
   Serial.begin(115200);
