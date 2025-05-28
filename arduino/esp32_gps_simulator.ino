@@ -2,17 +2,17 @@
 #include <HTTPClient.h>
 #include <time.h>
 
-// ✅ 1. Replace with your own WiFi credentials
+// ✅ 1. Replace with your WiFi credentials
 const char* ssid = "Michelangelo_5G";
 const char* password = "0661153026";
 
-// ✅ 2. Replace this with your computer’s local IP address (running Node-RED)
-const char* serverUrl = "http://192.168.1.38/gpsdata";
+// ✅ 2. Replace with your Node-RED server IP
+const char* serverUrl = "http://192.168.1.38:1880/gpsdata";  // Ensure port 1880 is included
 
 void setup() {
   Serial.begin(115200);
 
-  // ✅ 3. Connect to WiFi
+  // ✅ 3. Connect to Wi-Fi
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -34,12 +34,12 @@ void loop() {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
 
-    // ✅ 5. Generate dummy GPS + battery + timestamp data
-    float lat = 12.9716 + (random(-100, 100) / 10000.0);
+    // ✅ 5. Generate dummy GPS and battery data
+    float lat = 12.9716 + (random(-100, 100) / 10000.0);  // Bengaluru area
     float lon = 77.5946 + (random(-100, 100) / 10000.0);
-    int battery = random(40, 101);
+    int battery = random(40, 101);  // 40% to 100%
 
-    // ✅ 6. Get current time
+    // ✅ 6. Get current timestamp
     time_t now = time(nullptr);
     struct tm* timeinfo = localtime(&now);
     char timeStr[30];
@@ -53,7 +53,7 @@ void loop() {
     payload += "\"timestamp\":\"" + String(timeStr) + "\"";
     payload += "}";
 
-    // ✅ 8. Send data to Node-RED
+    // ✅ 8. Send POST to Node-RED
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
 
@@ -63,7 +63,7 @@ void loop() {
 
     http.end();
 
-    delay(10000); // ✅ Wait 1 hour (3600000 ms) – for testing, you can change to 10 seconds
+    delay(10000);  // ✅ Every 10 seconds
   } else {
     Serial.println("WiFi not connected!");
     delay(10000);
