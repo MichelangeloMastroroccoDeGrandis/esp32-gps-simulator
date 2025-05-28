@@ -20,7 +20,10 @@ This project simulates an ESP32 device sending dummy GPS, battery, and timestamp
 7. Import flow by copying /import/import.txt and using import function in editor top-right hamburger menu > import 
 8. In manage palette in hamburger menu, install node-red-contrib-uibuilder, node-red-dashboard and node-red-node-ui-table
 9. Change path to download csv in download to CSV function the path msg.filename = "C:\\Users\\micky\\Downloads\\gps_data.csv";
-6. Access dashboard at `http://localhost:1880/ui`
+10. alternatively, it is possible to test using postman
+11. POST http://*your_ip_here*:1880/gpsdata
+12. In body raw JSON add { "timestamp": "2025-05-28 24:41:00","lat": 16.346,"lon": 70.391,"battery": 58}
+13. Access dashboard at `http://localhost:1880/ui`
 ## License
 
 MIT
