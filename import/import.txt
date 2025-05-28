@@ -1,0 +1,334 @@
+[
+    {
+        "id": "fc17240526d18c7f",
+        "type": "tab",
+        "label": "ESP32 Dashboard",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2c9a4ac75e6bafac",
+        "type": "http in",
+        "z": "fc17240526d18c7f",
+        "name": "Receive ESP32 Data",
+        "url": "/gpsdata",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "2275f6a6b96b259a"
+            ]
+        ]
+    },
+    {
+        "id": "2275f6a6b96b259a",
+        "type": "json",
+        "z": "fc17240526d18c7f",
+        "name": "Parse JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 330,
+        "y": 300,
+        "wires": [
+            [
+                "0f02671faf6e0a29",
+                "00f1398339ed2aa0",
+                "download_csv_button"
+            ]
+        ]
+    },
+    {
+        "id": "d31111c8a78940ff",
+        "type": "ui_text",
+        "z": "fc17240526d18c7f",
+        "group": "6f0cf93f0604b280",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Latitude",
+        "label": "Latitude",
+        "format": "{{msg.payload.lat}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 700,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "a70869f831af5183",
+        "type": "ui_text",
+        "z": "fc17240526d18c7f",
+        "group": "6f0cf93f0604b280",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Longitude",
+        "label": "Longitude",
+        "format": "{{msg.payload.lon}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 700,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a66f8001456ef6f8",
+        "type": "ui_gauge",
+        "z": "fc17240526d18c7f",
+        "name": "Battery",
+        "group": "6f0cf93f0604b280",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "donut",
+        "title": "Battery Level",
+        "label": "%",
+        "format": "{{msg.payload.battery}}",
+        "min": 0,
+        "max": 100,
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 700,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "0f02671faf6e0a29",
+        "type": "http response",
+        "z": "fc17240526d18c7f",
+        "name": "HTTP 200 OK",
+        "statusCode": "",
+        "headers": {},
+        "x": 720,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "03dbc0e3d4172407",
+        "type": "ui_table",
+        "z": "fc17240526d18c7f",
+        "group": "6f0cf93f0604b280",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "columns": [
+            {
+                "field": "timestamp",
+                "title": "Time",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "battery",
+                "title": "Battery",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "lon",
+                "title": "Longitude",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "lat",
+                "title": "Latitude",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 690,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "00f1398339ed2aa0",
+        "type": "function",
+        "z": "fc17240526d18c7f",
+        "name": "function 1",
+        "func": "// Get existing array from global context, or initialize empty\nlet tableData = global.get(\"gpsData\") || [];\n\n// Check if msg.payload is an array or a single object\nif (Array.isArray(msg.payload)) {\n    // If array, append all elements\n    msg.payload.forEach(item => {\n        tableData.push(item);\n    });\n} else {\n    // If single object, just push it\n    tableData.push(msg.payload);\n}\n\n// Keep last 100 entries only\nwhile (tableData.length > 100) {\n    tableData.shift();\n}\n\n// Save back to global context\nglobal.set(\"gpsData\", tableData);\n\n// Output 1: latest single object for ui_text, ui_gauge (use the last received item)\nlet latestPayload = Array.isArray(msg.payload) ? msg.payload[msg.payload.length - 1] : msg.payload;\nlet latestMsg = { payload: latestPayload };\n\n// Output 2: full array for ui_table\nlet tableMsg = { payload: tableData };\n\n// Return both outputs\nreturn [latestMsg, tableMsg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 300,
+        "wires": [
+            [
+                "d31111c8a78940ff",
+                "a70869f831af5183",
+                "a66f8001456ef6f8"
+            ],
+            [
+                "03dbc0e3d4172407"
+            ]
+        ]
+    },
+    {
+        "id": "download_csv_button",
+        "type": "ui_button",
+        "z": "fc17240526d18c7f",
+        "name": "Download CSV",
+        "group": "6f0cf93f0604b280",
+        "order": 10,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Download CSV",
+        "tooltip": "Save GPS data to CSV file",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "file-download",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 400,
+        "y": 560,
+        "wires": [
+            [
+                "convert_to_csv"
+            ]
+        ]
+    },
+    {
+        "id": "convert_to_csv",
+        "type": "function",
+        "z": "fc17240526d18c7f",
+        "name": "Convert to CSV",
+        "func": "// Get GPS data\nlet data = global.get(\"gpsData\") || [];\n\nif (data.length === 0) {\n    msg.payload = \"No data available.\";\n    return [null, msg]; // Send to toast\n}\n\n// CSV header\nlet csv = \"Latitude,Longitude,Battery (%),Timestamp\\n\";\n\n// Add each row\ndata.forEach(item => {\n    csv += `${item.lat},${item.lon},${item.battery},${item.timestamp}\\n`;\n});\n\n// Set CSV as payload\nmsg.payload = csv;\nmsg.filename = \"C:\\\\Users\\\\micky\\\\Downloads\\\\gps_data.csv\"; // Update path as needed\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 560,
+        "wires": [
+            [
+                "write_to_file"
+            ],
+            [
+                "toast"
+            ]
+        ]
+    },
+    {
+        "id": "write_to_file",
+        "type": "file",
+        "z": "fc17240526d18c7f",
+        "name": "Save CSV to File",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 830,
+        "y": 540,
+        "wires": [
+            [
+                "toast_success"
+            ]
+        ]
+    },
+    {
+        "id": "toast_success",
+        "type": "ui_toast",
+        "z": "fc17240526d18c7f",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "Toast: Downloaded",
+        "x": 1040,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "toast",
+        "type": "ui_toast",
+        "z": "fc17240526d18c7f",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "Toast: No data",
+        "x": 830,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "6f0cf93f0604b280",
+        "type": "ui_group",
+        "name": "GPS Dashboard",
+        "tab": "dashboard_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dashboard_tab",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
