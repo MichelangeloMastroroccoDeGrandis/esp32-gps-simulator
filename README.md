@@ -23,7 +23,8 @@ This project simulates an ESP32 device sending dummy GPS, battery, and timestamp
 10. alternatively, it is possible to test using postman
 11. POST http://*your_ip_here*:1880/gpsdata
 12. In body raw JSON add { "timestamp": "2025-05-28 24:41:00","lat": 16.346,"lon": 70.391,"battery": 58}
-13. Access dashboard at `http://localhost:1880/ui`
+13. OR can use esp32 simulator like wokwi to run the esp32_gps_simulator.ino 
+14. Access dashboard at `http://localhost:1880/ui`
 ## License
 
 MIT

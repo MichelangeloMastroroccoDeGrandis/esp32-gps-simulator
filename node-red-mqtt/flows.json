@@ -1,0 +1,381 @@
+[
+    {
+        "id": "b85bc521d909a8bd",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "mqtt_gps_in",
+        "type": "mqtt in",
+        "z": "b85bc521d909a8bd",
+        "name": "GPS Data In",
+        "topic": "gps/data",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "88a6948b59d65ea3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 90,
+        "y": 180,
+        "wires": [
+            [
+                "4c8f6b71c3e25b3a"
+            ]
+        ]
+    },
+    {
+        "id": "extract_gps_data",
+        "type": "function",
+        "z": "b85bc521d909a8bd",
+        "name": "Extract GPS Data",
+        "func": "return [\n  { payload: msg.payload.battery },\n  { payload: `Lat: ${msg.payload.lat}, Lon: ${msg.payload.lon}` },\n  { payload: msg.payload.timestamp },\n  {\n    payload: {\n      name: \"ESP32\",\n      lat: msg.payload.lat,\n      lon: msg.payload.lon,\n      icon: \"fa-map-marker\",\n      layer: \"gps\"\n    }\n  }\n];",
+        "outputs": 4,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 180,
+        "wires": [
+            [
+                "ui_gauge_battery"
+            ],
+            [
+                "ui_text_location"
+            ],
+            [
+                "ui_text_timestamp"
+            ],
+            [
+                "worldmap"
+            ]
+        ]
+    },
+    {
+        "id": "ui_gauge_battery",
+        "type": "ui_gauge",
+        "z": "b85bc521d909a8bd",
+        "name": "Battery Level",
+        "group": "ui_gps_group",
+        "order": 1,
+        "width": 4,
+        "height": 2,
+        "gtype": "gage",
+        "title": "Battery",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": 100,
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 750,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ui_text_location",
+        "type": "ui_text",
+        "z": "b85bc521d909a8bd",
+        "group": "ui_gps_group",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "Location",
+        "label": "Location",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 740,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "ui_text_timestamp",
+        "type": "ui_text",
+        "z": "b85bc521d909a8bd",
+        "group": "ui_gps_group",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "Timestamp",
+        "label": "Timestamp",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 750,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "worldmap",
+        "type": "worldmap",
+        "z": "b85bc521d909a8bd",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMC",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "path": "/worldmap",
+        "overlist": "",
+        "maplist": "OSMC",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 740,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "4c8f6b71c3e25b3a",
+        "type": "json",
+        "z": "b85bc521d909a8bd",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 270,
+        "y": 180,
+        "wires": [
+            [
+                "extract_gps_data",
+                "f86ba8045cc89482"
+            ]
+        ]
+    },
+    {
+        "id": "1b3160ee0ebfb4ec",
+        "type": "inject",
+        "z": "b85bc521d909a8bd",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "f8d06d0337424f84"
+            ]
+        ]
+    },
+    {
+        "id": "f8d06d0337424f84",
+        "type": "mqtt out",
+        "z": "b85bc521d909a8bd",
+        "name": "",
+        "topic": "gps/data",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "88a6948b59d65ea3",
+        "x": 380,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f86ba8045cc89482",
+        "type": "function",
+        "z": "b85bc521d909a8bd",
+        "name": "function 3",
+        "func": "let gpsData = global.get(\"gpsData\") || [];\ngpsData.push(msg.payload);\nglobal.set(\"gpsData\", gpsData);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 280,
+        "wires": [
+            [
+                "3c07d6e33a012697"
+            ]
+        ]
+    },
+    {
+        "id": "3c07d6e33a012697",
+        "type": "ui_button",
+        "z": "b85bc521d909a8bd",
+        "name": "Download CSV",
+        "group": "ui_gps_group",
+        "order": 10,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Download CSV",
+        "tooltip": "Save GPS data to CSV file",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "file-download",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 340,
+        "y": 420,
+        "wires": [
+            [
+                "e7dd1057d7778585"
+            ]
+        ]
+    },
+    {
+        "id": "e7dd1057d7778585",
+        "type": "function",
+        "z": "b85bc521d909a8bd",
+        "name": "Convert to CSV",
+        "func": "// Get GPS data\nlet data = global.get(\"gpsData\") || [];\n\nif (data.length === 0) {\n    msg.payload = \"No data available.\";\n    return [null, msg]; // Send to toast\n}\n\n// CSV header\nlet csv = \"Latitude,Longitude,Battery (%),Timestamp\\n\";\n\n// Add each row\ndata.forEach(item => {\n    csv += `${item.lat},${item.lon},${item.battery},${item.timestamp}\\n`;\n});\n\n// Set CSV as payload\nmsg.payload = csv;\nmsg.filename = \"./gps_data.csv\"; // Update path as needed\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 420,
+        "wires": [
+            [
+                "b83d989d3fc0a2da"
+            ],
+            [
+                "d41cab764b99f67c"
+            ]
+        ]
+    },
+    {
+        "id": "b83d989d3fc0a2da",
+        "type": "file",
+        "z": "b85bc521d909a8bd",
+        "name": "Save CSV to File",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 770,
+        "y": 400,
+        "wires": [
+            [
+                "0bd9231010402aa8"
+            ]
+        ]
+    },
+    {
+        "id": "0bd9231010402aa8",
+        "type": "ui_toast",
+        "z": "b85bc521d909a8bd",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "Toast: Downloaded",
+        "x": 980,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "d41cab764b99f67c",
+        "type": "ui_toast",
+        "z": "b85bc521d909a8bd",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "Toast: No data",
+        "x": 770,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "88a6948b59d65ea3",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "test.mosquitto.org",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "3",
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ui_gps_group",
+        "type": "ui_group",
+        "name": "GPS Dashboard",
+        "tab": "ui_gps_tab",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_gps_tab",
+        "type": "ui_tab",
+        "name": "GPS Tracker",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]

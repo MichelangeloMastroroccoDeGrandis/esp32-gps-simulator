@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 #include <time.h>
 
-const char* ssid = "Mastro";
-const char* password = "zdzo9371";
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
 
 const char* serverUrl = "http://192.168.18.104:1880/gpsdata";  // Ensure port 1880 is included
 
