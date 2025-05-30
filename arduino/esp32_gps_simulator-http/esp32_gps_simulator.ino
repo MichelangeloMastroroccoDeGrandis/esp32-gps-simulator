@@ -5,7 +5,7 @@
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
-const char* serverUrl = "http://192.168.18.104:1880/gpsdata";  // Ensure port 1880 is included
+const char* serverUrl = "http://<your_ip>:1880/gpsdata";  // Ensure port 1880 is included
 
 void setup() {
   Serial.begin(115200);

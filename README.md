@@ -12,7 +12,7 @@ This project simulates an ESP32 device sending dummy GPS, battery, and timestamp
 ## How to Run Http
 
 1. Clone the repo
-2. Open `.ino` in Arduino IDE or VS Code
+2. Open `.ino` in Arduino IDE or VS Code and change const char* serverUrl with your_ip:1880/gpsdata
 3. Run Node-RED locally, in command prompt run:
 4. npm install -g --unsafe-perm node-red
 5. node-red
